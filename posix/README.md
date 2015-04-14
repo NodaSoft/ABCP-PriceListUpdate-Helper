@@ -8,8 +8,12 @@
 3. Флаг инкрементного прайса [необязательный]
 
 
+
 	sh ./update_price.sh 000000 /tmp/pricelist.csv
-	
+
+
 или
+
 	
 	sh ./update_price.sh 000000 /tmp/pricelist.csv inc
+
