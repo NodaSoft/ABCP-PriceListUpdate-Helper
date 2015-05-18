@@ -21,7 +21,6 @@ Next
 sFileTypeId = 1
 sIncrementalString = " incremental"
 If isInc = "inc" Then sFileTypeId = 4
-If isInc = "inc" Then sFileTypeId = 4
 
 Const Q = """"
 
@@ -47,8 +46,11 @@ Sub InfoEcho(Msg)
   WScript.Quit
 End Sub
 
-Class VbsJson
 
+Class VbsJson
+    'Author: Demon
+    'Date: 2012/5/3
+    'Website: http://demon.tw
     Private Whitespace, NumberRegex, StringChunk
     Private b, f, r, n, t
 
