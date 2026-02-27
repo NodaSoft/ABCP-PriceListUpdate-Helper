@@ -52,7 +52,7 @@ curl --version
 ### Windows VBS (устаревший вариант)
 
 - Windows Script Host (`cscript.exe`)
-- `curl` в `PATH` (или `windows/curl.exe` в той же папке)
+- [curl](https://curl.se/) в `PATH` (или `windows/curl.exe` в той же папке)
 
 ## Использование
 
