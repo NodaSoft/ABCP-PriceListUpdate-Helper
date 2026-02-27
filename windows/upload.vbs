@@ -5,7 +5,7 @@ ApiUserPsw = ""
 ApiHost = ""
 ' End Settings '
 
-If WScript.Arguments.Count < 2 Then InfoEcho "Error arguments"
+If WScript.Arguments.Count < 2 Then InfoEcho "Usage: upload.vbs <distributor_id> <file_path> [inc]"
 
 Dim aCounter, Arg, distributorId, filePath, isInc
 aCounter = 1
@@ -18,23 +18,37 @@ For Each Arg In WScript.Arguments
 	aCounter = aCounter + 1
 Next
 
+Dim sFileTypeId, sUploadMode, sBaseUrl
 sFileTypeId = 1
-sIncrementalString = " incremental"
-If isInc = "inc" Then sFileTypeId = 4
+sUploadMode = "full"
+If isInc = "inc" Then
+	sFileTypeId = 4
+	sUploadMode = "incremental"
+End If
+
+sBaseUrl = ApiHost
+If Left(LCase(sBaseUrl), 7) <> "http://" And Left(LCase(sBaseUrl), 8) <> "https://" Then
+	sBaseUrl = "https://" & sBaseUrl
+End If
+If Right(sBaseUrl, 1) = "/" Then
+	sBaseUrl = Left(sBaseUrl, Len(sBaseUrl) - 1)
+End If
 
 Const Q = """"
 
-WScript.Echo "Start uploading" & sIncrementalString & Q & " file.."
+WScript.Echo "Start uploading " & sUploadMode & " file..."
 
 Set WshShell = CreateObject("WScript.Shell")
-Set WshShellExec = WshShell.Exec("curl -X POST -H " & Q & "Content-Type: multipart/form-data" & Q & " -F " & Q & "userlogin=" & ApiUserLogin & Q & " -F " & Q & "userpsw=" & ApiUserPsw & Q & " -F " & Q & "distributorId=" & distributorId & Q & " -F " & Q & "fileTypeId=" & sFileTypeId & Q & " -F " & Q & "uploadFile=@" & filePath & Q & " http://" & ApiHost & "/cp/distributor/pricelistUpdate")
+Set WshShellExec = WshShell.Exec("curl -X POST -H " & Q & "Content-Type: multipart/form-data" & Q & " -F " & Q & "userlogin=" & ApiUserLogin & Q & " -F " & Q & "userpsw=" & ApiUserPsw & Q & " -F " & Q & "distributorId=" & distributorId & Q & " -F " & Q & "fileTypeId=" & sFileTypeId & Q & " -F " & Q & "uploadFile=@" & filePath & Q & " " & sBaseUrl & "/cp/distributor/pricelistUpdate")
 
-Select Case WshShellExec.Status
-   Case WshFinished
-       strOutput = WshShellExec.StdOut.ReadAll
-   Case WshFailed
-       strOutput = WshShellExec.StdErr.ReadAll
-End Select
+Do While WshShellExec.Status = 0
+	WScript.Sleep 100
+Loop
+
+strOutput = WshShellExec.StdOut.ReadAll
+If Len(strOutput) = 0 Then
+	strOutput = WshShellExec.StdErr.ReadAll
+End If
 
 Dim json, o
 Set json = New VbsJson
